@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import AddAccount from './components/AddAccount.vue'
+import Loading from './components/Loading.vue'
 import { HasAnyAccount } from '../wailsjs/go/main/App.js'
 
 const hasAnyAccount = ref(false)
@@ -12,6 +13,7 @@ onMounted(async () => {
 
 <template>
   <div class="app-wrapper">
+    <Loading />
     <div v-if="hasAnyAccount">You have some accounts.</div>
     <div v-else>
       <AddAccount/>

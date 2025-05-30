@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { AddAccount } from '../../wailsjs/go/main/App.js'
+import { useStore } from '../stores'
 
 const error = ref<string | null>(null)
 const success = ref<boolean>(false)
@@ -15,6 +16,7 @@ async function login() {
     await AddAccount(form.jid, form.password)
     error.value = null
     success.value = true
+    useStore().isLoading = true
   } catch (err: any) {
     success.value = false
     error.value = err || 'ERR_UNKNOWN'
