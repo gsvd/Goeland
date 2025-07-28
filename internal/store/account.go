@@ -10,16 +10,27 @@ type Account struct {
 	Password string
 }
 
-func (s *Store) AddAccount(jid string, password string) error {
-	_, err := s.db.Exec(`
+func (s *Store) AddAccount(jid string, password string) (*Account, error) {
+	res, err := s.db.Exec(`
 		INSERT INTO accounts (jid, password)
 		VALUES (?, ?)
 	`, jid, password)
 	if err != nil {
-		return fmt.Errorf("AddAccount: db.Exec: %w", err)
+		return nil, fmt.Errorf("AddAccount: db.Exec: %w", err)
 	}
-	return nil
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, fmt.Errorf("AddAccount: LastInsertId: %w", err)
+	}
+
+	return &Account{
+		ID:       int(id),
+		JID:      jid,
+		Password: password,
+	}, nil
 }
+
 
 func (s *Store) GetAllAccounts() ([]Account, error) {
 	rows, err := s.db.Query(`SELECT id, jid, password FROM accounts`)

@@ -1,11 +1,11 @@
 <template>
-  <div v-if="store.loading" class="loading-overlay">
+  <div v-if="store.isLoading" class="loading-overlay">
     <div class="spinner"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useStore } from '../stores'
+import { useStore } from '../store'
 
 const store = useStore()
 </script>
