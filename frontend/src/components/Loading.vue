@@ -1,14 +1,15 @@
-<template>
-  <div v-if="store.isLoading" class="loading-overlay">
-    <div class="spinner"></div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { useStore } from '../store'
 
 const store = useStore()
 </script>
+
+<template>
+  <div v-if="store.isLoading" class="loading-overlay gap-y-2">
+    <div class="spinner"></div>
+    <div class="text-white text-xl">Catching the wind...</div>
+  </div>
+</template>
 
 <style scoped>
 .loading-overlay {
@@ -17,8 +18,9 @@ const store = useStore()
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.7);
+  background-color: rgba(47, 49, 54, 0.9);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;

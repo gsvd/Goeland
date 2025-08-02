@@ -9,22 +9,29 @@ export const useStore = defineStore("app", {
     error: null as string | null,
     activeAccountId: null as number | null,
     uiState: {
-      showAddAccount: false,
+      showAuth: false,
     },
   }),
 
   getters: {
-    activeAccount(state): store.Account | null {
+    getActiveAccount(state): store.Account | null {
       return state.accounts.find(acc => acc.ID === state.activeAccountId) || null;
     },
+    getAccounts(state): store.Account[] {
+      return state.accounts;
+    }
   },
 
   actions: {
-    async getAllAccounts() {
+    async getAllAccounts(timeout: number = 2500) {
       this.isLoading = true;
       this.error = null;
       try {
         const raw = await GetAllAccounts();
+        if (!Array.isArray(raw)) {
+          throw new Error("Invalid response from GetAllAccounts");
+        }
+
         const accounts = raw.map((acc: any) => store.Account.createFrom(acc));
         this.accounts = accounts;
         if (accounts.length > 0 && this.activeAccountId === null) {
@@ -34,7 +41,9 @@ export const useStore = defineStore("app", {
         console.error("Failed to load accounts:", err);
         this.error = "Failed to load accounts";
       } finally {
-        this.isLoading = false;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, timeout);
       }
     },
 
@@ -57,12 +66,11 @@ export const useStore = defineStore("app", {
 
     setActiveAccount(id: number) {
       this.activeAccountId = id;
-      this.setShowAddAccount(false);
+      this.setShowAuth(false);
     },
 
-    setShowAddAccount(open: boolean) {
-
-      this.uiState.showAddAccount = open;
+    setShowAuth(open: boolean) {
+      this.uiState.showAuth = open;
     },
   },
 });
