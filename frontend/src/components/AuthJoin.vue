@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import { useStore } from '../store'
+import { useErrorHandler } from '../composables/useErrorHandler'
 
 const form = reactive({
   address: '',
@@ -9,42 +10,73 @@ const form = reactive({
 })
 
 const store = useStore()
+const { errorCode, fieldErrors, handleError, clearErrors } = useErrorHandler()
 
 async function join() {}
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col items-center justify-center py-16">
-    <h1 class="text-2xl font-medium mb-12">Join</h1>
-    <form @submit.prevent="join" class="w-full max-w-sm space-y-6">
+  <div class="flex flex-1 flex-col items-center justify-center py-12">
+    <h1 class="text-xl font-medium mb-8">Join</h1>
+
+    <form @submit.prevent="join" class="w-full max-w-sm space-y-4">
       <div>
-        <div class="flex items-center gap-x-4 mb-3">
-          <label class="block text-sm font-medium">XMPP address</label>
+        <label class="block text-sm font-medium mb-1">XMPP address</label>
+        <input
+          v-model="form.address"
+          type="text"
+          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          placeholder="gsvd@goeland.im"
+        />
+        <div class="min-h-[1rem] mt-0.5">
+          <p v-if="fieldErrors.address" class="text-red text-xs">
+            {{ $t(`errors.${fieldErrors.address}`) }}
+          </p>
         </div>
-        <input v-model="form.address" type="text"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise" placeholder="gsvd@goeland.im"
-          required />
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-3">Password</label>
-        <input v-model="form.password" type="password"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise" placeholder="********"
-          required />
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <input
+          v-model="form.password"
+          type="password"
+          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          placeholder="********"
+        />
+        <div class="min-h-[1rem] mt-0.5">
+          <p v-if="fieldErrors.password" class="text-red text-xs">
+            {{ $t(`errors.${fieldErrors.password}`) }}
+          </p>
+        </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-3">Confirm Password</label>
-        <input v-model="form.confirmPassword" type="password"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise" placeholder="********"
-          required />
+        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+        <input
+          v-model="form.confirmPassword"
+          type="password"
+          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          placeholder="********"
+        />
+        <div class="min-h-[1rem] mt-0.5">
+          <p v-if="fieldErrors.confirmPassword" class="text-red text-xs">
+            {{ $t(`errors.${fieldErrors.confirmPassword}`) }}
+          </p>
+        </div>
       </div>
 
-      <input type="submit" class="w-full py-2 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
-        value="Join" />
+      <input
+        type="submit"
+        class="w-full py-1.5 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
+        :disabled="store.loading"
+        value="Join"
+      />
     </form>
-    <p v-if="store.getError" class="text-red text-sm mt-4">
-      {{ $t(`errors.${store.getError}`) }}
-    </p>
+
+    <div class="min-h-[1rem] mt-3">
+      <p v-if="errorCode && !Object.keys(fieldErrors).length" class="text-red text-xs text-center">
+        {{ $t(`errors.${errorCode}`) }}
+      </p>
+    </div>
   </div>
 </template>

@@ -25,46 +25,52 @@ async function login() {
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col items-center justify-center py-16">
-    <h1 class="text-2xl font-medium mb-12">Login</h1>
+  <div class="flex flex-1 flex-col items-center justify-center py-12">
+    <h1 class="text-xl font-medium mb-8">Login</h1>
 
-    <form @submit.prevent="login" class="w-full max-w-sm space-y-6">
+    <form @submit.prevent="login" class="w-full max-w-sm space-y-4">
       <div>
-        <label class="block text-sm font-medium mb-2">XMPP address</label>
+        <label class="block text-sm font-medium mb-1">XMPP address</label>
         <input
           v-model="form.address"
           type="text"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise"
+          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
           placeholder="gsvd@goeland.im"
         />
-        <p v-if="fieldErrors.address" class="text-red text-sm mt-1">
-          {{ $t(`errors.${fieldErrors.address}`) }}
-        </p>
+        <div class="min-h-[1rem] mt-0.5">
+          <p v-if="fieldErrors.address" class="text-red text-xs">
+            {{ $t(`errors.${fieldErrors.address}`) }}
+          </p>
+        </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-2">Password</label>
+        <label class="block text-sm font-medium mb-1">Password</label>
         <input
           v-model="form.password"
           type="password"
-          class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise"
+          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
           placeholder="********"
         />
-        <p v-if="fieldErrors.password" class="text-red text-sm mt-1">
-          {{ $t(`errors.${fieldErrors.password}`) }}
-        </p>
+        <div class="min-h-[1rem] mt-0.5">
+          <p v-if="fieldErrors.password" class="text-red text-xs">
+            {{ $t(`errors.${fieldErrors.password}`) }}
+          </p>
+        </div>
       </div>
 
       <input
         type="submit"
-        class="w-full py-2 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
+        class="w-full py-1.5 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
         :disabled="store.loading"
         value="Login"
       />
     </form>
 
-    <p v-if="errorCode && !Object.keys(fieldErrors).length" class="text-red text-sm mt-4">
-      {{ $t(`errors.${errorCode}`) }}
-    </p>
+    <div class="min-h-[1rem] mt-3">
+      <p v-if="errorCode && !Object.keys(fieldErrors).length" class="text-red text-xs text-center">
+        {{ $t(`errors.${errorCode}`) }}
+      </p>
+    </div>
   </div>
 </template>
