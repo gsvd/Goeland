@@ -15,7 +15,6 @@ async function login() {
   store.loading = true
   try {
     await store.login(form.jid, form.password)
-    store.setShowAuth(false)
   } catch (err: any) {
     error.value = err || 'ERR_UNKNOWN'
   } finally {

@@ -7,7 +7,7 @@ export const useStore = defineStore("app", {
     accounts: [] as store.Account[],
     loading: false,
     error: null as string | null,
-    activeAccount: null as string | null,
+    activeAccount: null as store.Account | null,
     uiState: {
       showAuth: false,
     },
@@ -15,10 +15,10 @@ export const useStore = defineStore("app", {
 
   getters: {
     getActiveAccount(state): store.Account | null {
-      return state.accounts.find(acc => acc.JID === state.activeAccount) || null;
+      return state.activeAccount;
     },
     getActiveAccountJID(state): string | null {
-      return state.activeAccount;
+      return state.activeAccount ? state.activeAccount.JID : null;
     },
     getAccounts(state): store.Account[] {
       return state.accounts;
@@ -43,7 +43,7 @@ export const useStore = defineStore("app", {
         const accounts = raw.map((acc: any) => store.Account.createFrom(acc));
         this.accounts = accounts;
         if (accounts.length > 0 && this.activeAccount === null) {
-          this.setActiveAccount(accounts[0].JID);
+          this.setActiveAccount(accounts[0]);
         }
       } catch (err) {
         console.error("Failed to load accounts:", err);
@@ -59,12 +59,14 @@ export const useStore = defineStore("app", {
       const created = store.Account.createFrom(added);
       
       this.accounts.push(created);
-      this.setActiveAccount(created.JID);
     },
 
-    setActiveAccount(jid: string) {
-      OpenAccount(jid)
-      this.activeAccount = jid;
+    async setActiveAccount(account: store.Account | null) {
+      if (account) {
+        await OpenAccount(account);
+      }
+      
+      this.activeAccount = account;
       this.setShowAuth(false);
     },
 

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gsvd/goeland/internal/store"
+	"github.com/gsvd/goeland/pkg/errorsx"
 	"github.com/xmppo/go-xmpp"
 	"modernc.org/sqlite"
 	lib "modernc.org/sqlite/lib"
@@ -13,21 +14,19 @@ import (
 
 func (a *App) AddAccount(jid string, password string) (*store.Account, error) {
 	if jid == "" {
-		return nil, NewAppError("ERR_EMPTY_JID")
+		return nil, errorsx.NewAppError(errorsx.ErrCodeEmptyJID)
 	}
 	if password == "" {
-		return nil, NewAppError("ERR_PASSWORD_REQUIRED")
+		return nil, errorsx.NewAppError(errorsx.ErrCodePasswordRequired)
 	}
 
 	account, err := a.store.AddAccount(jid, password)
 	if err != nil {
 		var sqliteErr *sqlite.Error
-		if errors.As(err, &sqliteErr) {
-			if sqliteErr.Code() == lib.SQLITE_CONSTRAINT_UNIQUE {
-				return nil, NewAppError("ERR_ACCOUNT_EXISTS")
-			}
+		if errors.As(err, &sqliteErr) && sqliteErr.Code() == lib.SQLITE_CONSTRAINT_UNIQUE {
+			return nil, errorsx.NewAppError(errorsx.ErrCodeAccountExists)
 		}
-		return nil, fmt.Errorf("AddAccount: %w", err)
+		return nil, errorsx.NewAppError(errorsx.ErrCodeUnknown)
 	}
 
 	return account, nil
@@ -36,20 +35,35 @@ func (a *App) AddAccount(jid string, password string) (*store.Account, error) {
 func (a *App) GetAllAccounts() ([]store.Account, error) {
 	accounts, err := a.store.GetAllAccounts()
 	if err != nil {
-		return nil, fmt.Errorf("GetAllAccounts: %w", err)
+		return nil, errorsx.NewAppError(errorsx.ErrCodeUnknown)
 	}
 	return accounts, nil
 }
 
-func (a *App) OpenAccount(jid string) error {
-	account, err := a.store.GetAccountByJID(jid)
+func (a *App) OpenAllAccounts() error {
+	accounts, err := a.store.GetAllAccounts()
 	if err != nil {
-		return fmt.Errorf("GetAllAccounts: %w", err)
+		return errorsx.NewAppError(errorsx.ErrCodeUnknown)
 	}
 
-	username := strings.Split(account.JID, "@")[0]
+	for _, account := range accounts {
+		if err := a.OpenAccount(account); err != nil {
+			return errorsx.NewAppError(errorsx.ErrCodeUnknown)
+		}
+	}
+
+	return nil
+}
+
+func (a *App) OpenAccount(account store.Account) error {
+	a.mu.Lock()
+	if _, exists := a.connections[account.JID]; exists {
+		a.mu.Unlock()
+		return nil
+	}
+	a.mu.Unlock()
+
 	host := strings.Split(account.JID, "@")[1]
-	fmt.Printf("Connecting to %s@%s...\n", username, host)
 
 	options := xmpp.Options{
 		Host:          host,
@@ -59,16 +73,18 @@ func (a *App) OpenAccount(jid string) error {
 		Session:       false,
 		Status:        "xa",
 		StatusMessage: "Available",
-
-		NoTLS:    true,
-		StartTLS: true,
+		NoTLS:         true,
+		StartTLS:      true,
 	}
 
 	talk, err := options.NewClient()
 	if err != nil {
-		fmt.Printf("OpenAccount: NewClient: %v\n", err)
-		return fmt.Errorf("OpenAccount: NewClient: %w", err)
+		return errorsx.NewAppError(errorsx.ErrCodeUnknown)
 	}
+
+	a.mu.Lock()
+	a.connections[account.JID] = talk
+	a.mu.Unlock()
 
 	go func() {
 		for {
@@ -76,12 +92,18 @@ func (a *App) OpenAccount(jid string) error {
 			if err != nil {
 				fmt.Printf("OpenAccount: Recv: %v\n", err)
 			}
+
+			var msg string
 			switch v := chat.(type) {
 			case xmpp.Chat:
-				fmt.Println(v.Remote, v.Text)
+				msg = fmt.Sprintf("%s: %s", v.Remote, v.Text)
 			case xmpp.Presence:
-				fmt.Println(v.From, v.Show)
+				msg = fmt.Sprintf("%s: %s", v.From, v.Show)
 			}
+
+			a.mu.Lock()
+			a.messages[account.JID] = append(a.messages[account.JID], msg)
+			a.mu.Unlock()
 		}
 	}()
 
