@@ -15,63 +15,19 @@ const additionalItems = [
 </script>
 
 <template v-if="store.getAccounts.length === 0 || store.uiState.showAuth">
-  <aside class="sidebar">
-    <div class="account-list">
-      <button v-for="account in store.getAccounts" :key="account.ID" class="account-item" :title="account.JID"
-        :class="{ active: activeId === account.ID && !store.uiState.showAuth }"
+  <aside class="w-[80px] flex flex-col items-center py-3 text-base0 bg-base03">
+    <div class="flex flex-col gap-3 items-center">
+      <button v-for="account in store.getAccounts" :key="account.ID" class="w-12 h-12 rounded-full bg-base04 flex items-center justify-center cursor-pointer font-bold hover:outline-2 hover:outline-base0" :title="account.JID"
+        :class="{ ['outline-2 outline-base0']: activeId === account.ID && !store.uiState.showAuth }"
         @click="store.setActiveAccount(account.ID)">
         {{ account.JID.charAt(0).toUpperCase() }}
       </button>
-      <button v-for="item in additionalItems" :key="item.id" class="account-item" :title="item.title"
-      :class="{ active: store.uiState.showAuth }"
+      <button v-for="item in additionalItems" :key="item.id" class="w-12 h-12 rounded-full bg-base04 flex items-center justify-center cursor-pointer font-bold hover:outline-2 hover:outline-base0" :title="item.title"
+      :class="{ ['outline-2 outline-base0']: store.uiState.showAuth }"
         @click="item.action">
-        <span class="text-white">{{ item.icon }}</span>
+        <span class="text-base0 text-xl">{{ item.icon }}</span>
       </button>
     </div>
   </aside>
 </template>
-
-<style scoped>
-.sidebar {
-  width: 80px;
-  background-color: #202225;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 0;
-}
-
-.account-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  align-items: center;
-}
-
-.account-item {
-  width: 48px;
-  height: 48px;
-  background-color: #36393f;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-
-.account-item:hover {
-  background-color: #5865f2;
-}
-
-.account-item.active {
-  border: 2px solid #5865f2;
-  background-color: #444;
-}
-
-.account-item.active:hover {
-  background-color: #5865f2;
-}
-</style>
+\

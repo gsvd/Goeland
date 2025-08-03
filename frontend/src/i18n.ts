@@ -2,7 +2,6 @@ import { createI18n } from 'vue-i18n'
 
 const messages = {
   fr: {
-    hello: 'Bonjour',
     errors: {
       ERR_EMPTY_JID: "Le JID est requis.",
       ERR_INVALID_JID: "Le JID doit contenir un '@'.",
@@ -15,7 +14,6 @@ const messages = {
     }
   },
   en: {
-    hello: 'Hello',
     errors: {
       ERR_EMPTY_JID: "JID is required.",
       ERR_INVALID_JID: "JID must contain '@'.",

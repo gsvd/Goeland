@@ -13,18 +13,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="layout">
+  <div class="flex min-h-screen">
     <Sidebar />
 
-    <main class="main-content">
+    <main class="main-content flex-1 overflow-y-auto bg-base02">
       <Loading v-if="store.isLoading" />
 
       <Auth />
-      <div v-if="!store.getActiveAccount && !store.uiState.showAuth">
-        <p class="text-center text-gray-400">Select an account to manage</p>
-      </div>
-      <div v-else-if="store.getActiveAccount && !store.uiState.showAuth">
-        <p class="text-white text-xl text-center">
+      <div v-if="store.getActiveAccount && !store.uiState.showAuth">
+        <p class="text-xl text-center text-base0">
           Logged in as {{ store.getActiveAccount?.JID }}
         </p>
       </div>
@@ -32,18 +29,3 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.layout {
-  display: flex;
-  height: 100vh;
-  background-color: #2f3136;
-  color: white;
-  font-family: sans-serif;
-}
-
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  background-color: #36393f;
-}
-</style>

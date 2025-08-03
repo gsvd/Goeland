@@ -16,7 +16,7 @@ onDeactivated(() => {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-row justify-center items-center divide-x-2 divide-[#202225] divide-dashed">
+  <div v-if="store.uiState.showAuth" class="flex min-h-screen flex-row justify-center items-center divide-x-2 divide-base04 divide-dashed text-base0">
     <AuthLogin />
     <AuthJoin />
   </div>

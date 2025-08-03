@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import { store } from "../../wailsjs/go/models";
 import { GetAllAccounts, AddAccount } from "../../wailsjs/go/main/App.js";
+import { get } from "http";
+import { resolve } from "path";
 
 export const useStore = defineStore("app", {
   state: () => ({
     accounts: [] as store.Account[],
-    isLoading: false,
+    loading: false,
     error: null as string | null,
     activeAccountId: null as number | null,
     uiState: {
@@ -19,13 +21,18 @@ export const useStore = defineStore("app", {
     },
     getAccounts(state): store.Account[] {
       return state.accounts;
+    },
+    isLoading(state): boolean {
+      return state.loading;
+    },
+    getError(state): string | null {
+      return state.error;
     }
   },
 
   actions: {
     async getAllAccounts(timeout: number = 2500) {
-      this.isLoading = true;
-      this.error = null;
+      this.loading = true;
       try {
         const raw = await GetAllAccounts();
         if (!Array.isArray(raw)) {
@@ -39,29 +46,19 @@ export const useStore = defineStore("app", {
         }
       } catch (err) {
         console.error("Failed to load accounts:", err);
-        this.error = "Failed to load accounts";
       } finally {
         setTimeout(() => {
-          this.isLoading = false;
+          this.loading = false;
         }, timeout);
       }
     },
 
     async login(jid: string, password: string) {
-      this.isLoading = true;
-      this.error = null;
-      try {
-        const added = await AddAccount(jid, password);
-        const created = store.Account.createFrom(added);
-        
-        this.accounts.push(created);
-        this.setActiveAccount(created.ID);
-      } catch (err: any) {
-        console.error("Failed to add account:", err);
-        this.error = err?.message || "ERR_UNKNOWN";
-      } finally {
-        this.isLoading = false;
-      }
+      const added = await AddAccount(jid, password);
+      const created = store.Account.createFrom(added);
+      
+      this.accounts.push(created);
+      this.setActiveAccount(created.ID);
     },
 
     setActiveAccount(id: number) {
@@ -71,6 +68,10 @@ export const useStore = defineStore("app", {
 
     setShowAuth(open: boolean) {
       this.uiState.showAuth = open;
+    },
+
+    setError(error: string | null) {
+      this.error = error;
     },
   },
 });
