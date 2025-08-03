@@ -5,7 +5,7 @@ import { useStore } from '../store'
 const error = ref<string | null>(null)
 
 const form = reactive({
-  jid: '',
+  address: '',
   password: '',
 })
 
@@ -14,7 +14,7 @@ const store = useStore()
 async function login() {
   store.loading = true
   try {
-    await store.login(form.jid, form.password)
+    await store.login(form.address, form.password)
   } catch (err: any) {
     error.value = err || 'ERR_UNKNOWN'
   } finally {
@@ -29,9 +29,9 @@ async function login() {
     <form @submit.prevent="login" class="w-full max-w-sm space-y-6">
       <div>
         <div class="flex items-center gap-x-4 mb-3">
-          <label class="block text-sm font-medium">JID</label>
+          <label class="block text-sm font-medium">XMPP address</label>
         </div>
-        <input v-model="form.jid" type="text"
+        <input v-model="form.address" type="text"
           class="w-full px-3 py-2 border rounded-md focus:outline-none border-ardoise" placeholder="gsvd@goeland.im"
           required />
       </div>

@@ -17,8 +17,8 @@ export const useStore = defineStore("app", {
     getActiveAccount(state): store.Account | null {
       return state.activeAccount;
     },
-    getActiveAccountJID(state): string | null {
-      return state.activeAccount ? state.activeAccount.JID : null;
+    getActiveAccountAddress(state): string | null {
+      return state.activeAccount ? state.activeAccount.Address : null;
     },
     getAccounts(state): store.Account[] {
       return state.accounts;
@@ -54,8 +54,8 @@ export const useStore = defineStore("app", {
       }
     },
 
-    async login(jid: string, password: string) {
-      const added = await AddAccount(jid, password);
+    async login(address: string, password: string) {
+      const added = await AddAccount(address, password);
       const created = store.Account.createFrom(added);
       
       this.accounts.push(created);

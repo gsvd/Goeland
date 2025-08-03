@@ -22,7 +22,7 @@ onMounted(() => {
       <Auth />
       <div v-if="store.getActiveAccount && !store.uiState.showAuth">
         <p class="text-xl text-center text-base0">
-          Logged in as {{ store.getActiveAccount?.JID }}
+          Logged in as {{ store.getActiveAccount?.Address }}
         </p>
       </div>
     </main>

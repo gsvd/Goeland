@@ -7,15 +7,15 @@ import (
 
 type Account struct {
 	ID       int
-	JID      string
+	Address  string
 	Password string
 }
 
-func (s *Store) AddAccount(jid string, password string) (*Account, error) {
+func (s *Store) AddAccount(address string, password string) (*Account, error) {
 	res, err := s.db.Exec(`
-		INSERT INTO accounts (jid, password)
+		INSERT INTO accounts (address, password)
 		VALUES (?, ?)
-	`, jid, password)
+	`, address, password)
 	if err != nil {
 		return nil, fmt.Errorf("AddAccount: db.Exec: %w", err)
 	}
@@ -27,13 +27,13 @@ func (s *Store) AddAccount(jid string, password string) (*Account, error) {
 
 	return &Account{
 		ID:       int(id),
-		JID:      jid,
+		Address:  address,
 		Password: password,
 	}, nil
 }
 
 func (s *Store) GetAllAccounts() ([]Account, error) {
-	rows, err := s.db.Query(`SELECT id, jid, password FROM accounts`)
+	rows, err := s.db.Query(`SELECT id, address, password FROM accounts`)
 	if err != nil {
 		return nil, fmt.Errorf("GetAllAccounts: db.Query: %w", err)
 	}
@@ -42,7 +42,7 @@ func (s *Store) GetAllAccounts() ([]Account, error) {
 	var accounts []Account
 	for rows.Next() {
 		var a Account
-		if err := rows.Scan(&a.ID, &a.JID, &a.Password); err != nil {
+		if err := rows.Scan(&a.ID, &a.Address, &a.Password); err != nil {
 			return nil, fmt.Errorf("GetAllAccounts: rows.Scan: %w", err)
 		}
 		accounts = append(accounts, a)
@@ -50,15 +50,15 @@ func (s *Store) GetAllAccounts() ([]Account, error) {
 	return accounts, nil
 }
 
-func (s *Store) GetAccountByJID(jid string) (*Account, error) {
-	row := s.db.QueryRow(`SELECT id, jid, password FROM accounts WHERE jid = ?`, jid)
+func (s *Store) GetAccountByAddress(address string) (*Account, error) {
+	row := s.db.QueryRow(`SELECT id, address, password FROM accounts WHERE address = ?`, address)
 
 	var a Account
-	if err := row.Scan(&a.ID, &a.JID, &a.Password); err != nil {
+	if err := row.Scan(&a.ID, &a.Address, &a.Password); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("GetAccountByJID: no account found for JID %s", jid)
+			return nil, fmt.Errorf("GetAccountByAddress: no account found for address %s", address)
 		}
-		return nil, fmt.Errorf("GetAccountByJID: row.Scan: %w", err)
+		return nil, fmt.Errorf("GetAccountByAddress: row.Scan: %w", err)
 	}
 	return &a, nil
 }

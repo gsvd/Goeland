@@ -52,7 +52,7 @@ func initSchema(db *sql.DB) error {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS accounts (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			jid TEXT NOT NULL UNIQUE,
+			address TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL
 		);
 	`)

@@ -12,15 +12,15 @@ import (
 	lib "modernc.org/sqlite/lib"
 )
 
-func (a *App) AddAccount(jid string, password string) (*store.Account, error) {
-	if jid == "" {
-		return nil, errorsx.NewAppError(errorsx.ErrCodeEmptyJID)
+func (a *App) AddAccount(address string, password string) (*store.Account, error) {
+	if address == "" {
+		return nil, errorsx.NewAppError(errorsx.ErrCodeEmptyAddress)
 	}
 	if password == "" {
 		return nil, errorsx.NewAppError(errorsx.ErrCodePasswordRequired)
 	}
 
-	account, err := a.store.AddAccount(jid, password)
+	account, err := a.store.AddAccount(address, password)
 	if err != nil {
 		var sqliteErr *sqlite.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.Code() == lib.SQLITE_CONSTRAINT_UNIQUE {
@@ -57,17 +57,17 @@ func (a *App) OpenAllAccounts() error {
 
 func (a *App) OpenAccount(account store.Account) error {
 	a.mu.Lock()
-	if _, exists := a.connections[account.JID]; exists {
+	if _, exists := a.connections[account.Address]; exists {
 		a.mu.Unlock()
 		return nil
 	}
 	a.mu.Unlock()
 
-	host := strings.Split(account.JID, "@")[1]
+	host := strings.Split(account.Address, "@")[1]
 
 	options := xmpp.Options{
 		Host:          host,
-		User:          account.JID,
+		User:          account.Address,
 		Password:      account.Password,
 		Debug:         true,
 		Session:       false,
@@ -83,7 +83,7 @@ func (a *App) OpenAccount(account store.Account) error {
 	}
 
 	a.mu.Lock()
-	a.connections[account.JID] = talk
+	a.connections[account.Address] = talk
 	a.mu.Unlock()
 
 	go func() {
@@ -102,7 +102,7 @@ func (a *App) OpenAccount(account store.Account) error {
 			}
 
 			a.mu.Lock()
-			a.messages[account.JID] = append(a.messages[account.JID], msg)
+			a.messages[account.Address] = append(a.messages[account.Address], msg)
 			a.mu.Unlock()
 		}
 	}()
