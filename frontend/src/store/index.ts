@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 import { store } from "../../wailsjs/go/models";
 import { GetAllAccounts, AddAccount } from "../../wailsjs/go/main/App.js";
-import { get } from "http";
-import { resolve } from "path";
 
 export const useStore = defineStore("app", {
   state: () => ({
@@ -42,7 +40,7 @@ export const useStore = defineStore("app", {
         const accounts = raw.map((acc: any) => store.Account.createFrom(acc));
         this.accounts = accounts;
         if (accounts.length > 0 && this.activeAccountId === null) {
-          this.activeAccountId = accounts[0].ID;
+          this.setActiveAccount(accounts[0].ID);
         }
       } catch (err) {
         console.error("Failed to load accounts:", err);

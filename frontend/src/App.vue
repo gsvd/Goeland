@@ -16,7 +16,7 @@ onMounted(() => {
   <div class="flex min-h-screen">
     <Sidebar />
 
-    <main class="main-content flex-1 overflow-y-auto bg-base02">
+    <main class="flex-1 overflow-y-auto bg-base02">
       <Loading v-if="store.isLoading" />
 
       <Auth />

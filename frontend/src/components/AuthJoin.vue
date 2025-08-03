@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { useStore } from '../store'
 
 const form = reactive({
@@ -43,7 +43,7 @@ async function join() {}
       <input type="submit" class="w-full py-2 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
         value="Join" />
     </form>
-    <p v-if="store.getError" class="text-red-500 text-sm mt-4">
+    <p v-if="store.getError" class="text-red text-sm mt-4">
       {{ $t(`errors.${store.getError}`) }}
     </p>
   </div>
