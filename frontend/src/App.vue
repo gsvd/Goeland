@@ -4,11 +4,13 @@ import { useStore } from './store'
 import Auth from './components/Auth.vue'
 import Loading from './components/Loading.vue'
 import Sidebar from './components/Sidebar.vue'
+import { OpenAllAccounts } from '../wailsjs/go/main/App'
 
 const store = useStore()
 
-onMounted(() => {
-  store.getAllAccounts()
+onMounted(async () => {
+  await store.getAllAccounts()
+  await OpenAllAccounts
 })
 </script>
 

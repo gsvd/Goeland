@@ -7,6 +7,10 @@ const messages = {
       ERR_INVALID_ADDRESS: "Address must contain '@'.",
       ERR_PASSWORD_REQUIRED: "Password is required.",
       ERR_ACCOUNT_EXISTS: "An account with this address is already connected.",
+
+      ERR_INVALID_INPUT: "Invalid form input.",
+      ERR_INVALID_ADDRESS_FORMAT: "Invalid XMPP address format.",
+
       ERR_UNKNOWN: "An unknown error occurred."
     },
     account: {

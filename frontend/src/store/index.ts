@@ -62,10 +62,6 @@ export const useStore = defineStore("app", {
     },
 
     async setActiveAccount(account: store.Account | null) {
-      if (account) {
-        await OpenAccount(account);
-      }
-      
       this.activeAccount = account;
       this.setShowAuth(false);
     },

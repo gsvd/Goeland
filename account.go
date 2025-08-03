@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gsvd/goeland/internal/store"
+	"github.com/gsvd/goeland/internal/validation"
 	"github.com/gsvd/goeland/pkg/errorsx"
 	"github.com/xmppo/go-xmpp"
 	"modernc.org/sqlite"
@@ -13,20 +14,32 @@ import (
 )
 
 func (a *App) AddAccount(address string, password string) (*store.Account, error) {
-	if address == "" {
-		return nil, errorsx.NewAppError(errorsx.ErrCodeEmptyAddress)
+	if err := validation.ValidateXMPPAddress(address); err != nil {
+		if mErr, ok := err.(interface{ Marshal() error }); ok {
+			return nil, mErr.Marshal()
+		}
+		return nil, err
 	}
+
 	if password == "" {
-		return nil, errorsx.NewAppError(errorsx.ErrCodePasswordRequired)
+		return nil, errorsx.NewAPIError(errorsx.ErrCodePasswordRequired)
+	}
+
+	err := a.OpenAccount(store.Account{
+		Address:  address,
+		Password: password,
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	account, err := a.store.AddAccount(address, password)
 	if err != nil {
 		var sqliteErr *sqlite.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.Code() == lib.SQLITE_CONSTRAINT_UNIQUE {
-			return nil, errorsx.NewAppError(errorsx.ErrCodeAccountExists)
+			return nil, errorsx.NewAPIError(errorsx.ErrCodeAccountExists)
 		}
-		return nil, errorsx.NewAppError(errorsx.ErrCodeUnknown)
+		return nil, errorsx.NewAPIError(errorsx.ErrCodeUnknown)
 	}
 
 	return account, nil
@@ -35,7 +48,7 @@ func (a *App) AddAccount(address string, password string) (*store.Account, error
 func (a *App) GetAllAccounts() ([]store.Account, error) {
 	accounts, err := a.store.GetAllAccounts()
 	if err != nil {
-		return nil, errorsx.NewAppError(errorsx.ErrCodeUnknown)
+		return nil, errorsx.NewAPIError(errorsx.ErrCodeUnknown)
 	}
 	return accounts, nil
 }
@@ -43,12 +56,12 @@ func (a *App) GetAllAccounts() ([]store.Account, error) {
 func (a *App) OpenAllAccounts() error {
 	accounts, err := a.store.GetAllAccounts()
 	if err != nil {
-		return errorsx.NewAppError(errorsx.ErrCodeUnknown)
+		return errorsx.NewAPIError(errorsx.ErrCodeUnknown)
 	}
 
 	for _, account := range accounts {
 		if err := a.OpenAccount(account); err != nil {
-			return errorsx.NewAppError(errorsx.ErrCodeUnknown)
+			return errorsx.NewAPIError(errorsx.ErrCodeUnknown)
 		}
 	}
 
@@ -79,7 +92,7 @@ func (a *App) OpenAccount(account store.Account) error {
 
 	talk, err := options.NewClient()
 	if err != nil {
-		return errorsx.NewAppError(errorsx.ErrCodeUnknown)
+		return errorsx.NewAPIError(errorsx.ErrCodeAuthenticationFailed)
 	}
 
 	a.mu.Lock()
