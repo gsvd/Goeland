@@ -1,6 +1,7 @@
 package store
 
 import (
+	"database/sql"
 	"fmt"
 )
 
@@ -31,7 +32,6 @@ func (s *Store) AddAccount(jid string, password string) (*Account, error) {
 	}, nil
 }
 
-
 func (s *Store) GetAllAccounts() ([]Account, error) {
 	rows, err := s.db.Query(`SELECT id, jid, password FROM accounts`)
 	if err != nil {
@@ -48,6 +48,19 @@ func (s *Store) GetAllAccounts() ([]Account, error) {
 		accounts = append(accounts, a)
 	}
 	return accounts, nil
+}
+
+func (s *Store) GetAccountByJID(jid string) (*Account, error) {
+	row := s.db.QueryRow(`SELECT id, jid, password FROM accounts WHERE jid = ?`, jid)
+
+	var a Account
+	if err := row.Scan(&a.ID, &a.JID, &a.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("GetAccountByJID: no account found for JID %s", jid)
+		}
+		return nil, fmt.Errorf("GetAccountByJID: row.Scan: %w", err)
+	}
+	return &a, nil
 }
 
 func (s *Store) DeleteAccount(id int) error {

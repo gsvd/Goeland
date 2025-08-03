@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import { store } from "../../wailsjs/go/models";
-import { GetAllAccounts, AddAccount } from "../../wailsjs/go/main/App.js";
+import { GetAllAccounts, AddAccount, OpenAccount } from "../../wailsjs/go/main/App.js";
 
 export const useStore = defineStore("app", {
   state: () => ({
     accounts: [] as store.Account[],
     loading: false,
     error: null as string | null,
-    activeAccountId: null as number | null,
+    activeAccount: null as string | null,
     uiState: {
       showAuth: false,
     },
@@ -15,7 +15,10 @@ export const useStore = defineStore("app", {
 
   getters: {
     getActiveAccount(state): store.Account | null {
-      return state.accounts.find(acc => acc.ID === state.activeAccountId) || null;
+      return state.accounts.find(acc => acc.JID === state.activeAccount) || null;
+    },
+    getActiveAccountJID(state): string | null {
+      return state.activeAccount;
     },
     getAccounts(state): store.Account[] {
       return state.accounts;
@@ -39,8 +42,8 @@ export const useStore = defineStore("app", {
 
         const accounts = raw.map((acc: any) => store.Account.createFrom(acc));
         this.accounts = accounts;
-        if (accounts.length > 0 && this.activeAccountId === null) {
-          this.setActiveAccount(accounts[0].ID);
+        if (accounts.length > 0 && this.activeAccount === null) {
+          this.setActiveAccount(accounts[0].JID);
         }
       } catch (err) {
         console.error("Failed to load accounts:", err);
@@ -56,11 +59,12 @@ export const useStore = defineStore("app", {
       const created = store.Account.createFrom(added);
       
       this.accounts.push(created);
-      this.setActiveAccount(created.ID);
+      this.setActiveAccount(created.JID);
     },
 
-    setActiveAccount(id: number) {
-      this.activeAccountId = id;
+    setActiveAccount(jid: string) {
+      OpenAccount(jid)
+      this.activeAccount = jid;
       this.setShowAuth(false);
     },
 

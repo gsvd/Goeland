@@ -53,7 +53,7 @@ func initSchema(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS accounts (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			jid TEXT NOT NULL UNIQUE,
-			password TEXT
+			password TEXT NOT NULL
 		);
 	`)
 	return err

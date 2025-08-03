@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { useStore } from '../store'
 
 const store = useStore()
-const activeId = computed(() => store.activeAccountId)
 const additionalItems = [
   {
     id: 'add-account',
@@ -18,8 +17,8 @@ const additionalItems = [
   <aside class="w-[80px] flex flex-col items-center py-3 text-base0 bg-base03">
     <div class="flex flex-col gap-3 items-center">
       <button v-for="account in store.getAccounts" :key="account.ID" class="w-12 h-12 rounded-full bg-base04 flex items-center justify-center cursor-pointer font-bold hover:outline-2 hover:outline-base0" :title="account.JID"
-        :class="{ 'outline-2 outline-base0': activeId === account.ID && !store.uiState.showAuth }"
-        @click="store.setActiveAccount(account.ID)">
+        :class="{ 'outline-2 outline-base0': store.getActiveAccountJID === account.JID && !store.uiState.showAuth }"
+        @click="store.setActiveAccount(account.JID)">
         {{ account.JID.charAt(0).toUpperCase() }}
       </button>
       <button v-for="item in additionalItems" :key="item.id" class="w-12 h-12 rounded-full bg-base04 flex items-center justify-center cursor-pointer font-bold hover:outline-2 hover:outline-base0" :title="item.title"
