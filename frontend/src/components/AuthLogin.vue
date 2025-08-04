@@ -34,7 +34,7 @@ async function login() {
         <input
           v-model="form.address"
           type="text"
-          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          required
           placeholder="gsvd@goeland.im"
         />
         <div class="min-h-[1rem] mt-0.5">
@@ -49,7 +49,7 @@ async function login() {
         <input
           v-model="form.password"
           type="password"
-          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          required
           placeholder="********"
         />
         <div class="min-h-[1rem] mt-0.5">
@@ -61,7 +61,6 @@ async function login() {
 
       <input
         type="submit"
-        class="w-full py-1.5 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
         :disabled="store.loading"
         value="Login"
       />

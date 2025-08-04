@@ -3,6 +3,8 @@ import { reactive } from 'vue'
 import { useStore } from '../store'
 import { useErrorHandler } from '../composables/useErrorHandler'
 
+const disabled = true
+
 const form = reactive({
   address: '',
   password: '',
@@ -25,7 +27,7 @@ async function join() {}
         <input
           v-model="form.address"
           type="text"
-          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          :disabled="disabled"
           placeholder="gsvd@goeland.im"
         />
         <div class="min-h-[1rem] mt-0.5">
@@ -40,7 +42,7 @@ async function join() {}
         <input
           v-model="form.password"
           type="password"
-          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          :disabled="disabled"
           placeholder="********"
         />
         <div class="min-h-[1rem] mt-0.5">
@@ -55,7 +57,8 @@ async function join() {}
         <input
           v-model="form.confirmPassword"
           type="password"
-          class="w-full px-3 py-1.5 border rounded-md focus:outline-none border-ardoise"
+          class=""
+          :disabled="disabled"
           placeholder="********"
         />
         <div class="min-h-[1rem] mt-0.5">
@@ -67,14 +70,16 @@ async function join() {}
 
       <input
         type="submit"
-        class="w-full py-1.5 rounded-md bg-base03 hover:bg-base04 transition cursor-pointer"
-        :disabled="store.loading"
+        :disabled="disabled || store.loading"
         value="Join"
       />
     </form>
 
     <div class="min-h-[1rem] mt-3">
-      <p v-if="errorCode && !Object.keys(fieldErrors).length" class="text-red text-xs text-center">
+      <p v-if="disabled" class="text-red text-xs text-center">
+        Not available yet.
+      </p>
+      <p v-else-if="errorCode && !Object.keys(fieldErrors).length" class="text-red text-xs text-center">
         {{ $t(`errors.${errorCode}`) }}
       </p>
     </div>

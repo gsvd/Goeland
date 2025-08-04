@@ -5,12 +5,13 @@ import Auth from './components/Auth.vue'
 import Loading from './components/Loading.vue'
 import Sidebar from './components/Sidebar.vue'
 import { OpenAllAccounts } from '../wailsjs/go/main/App'
+import OpenedAccount from './components/OpenedAccount.vue'
 
 const store = useStore()
 
-onMounted(async () => {
-  await store.getAllAccounts()
-  await OpenAllAccounts
+onMounted(() => {
+  store.getAllAccounts(1000)
+  OpenAllAccounts()
 })
 </script>
 
@@ -18,16 +19,10 @@ onMounted(async () => {
   <div class="flex min-h-screen">
     <Sidebar />
 
-    <main class="flex-1 overflow-y-auto bg-base02">
+    <main class="flex-1 bg-base02">
       <Loading v-if="store.isLoading" />
-
       <Auth />
-      <div v-if="store.getActiveAccount && !store.uiState.showAuth">
-        <p class="text-xl text-center text-base0">
-          Logged in as {{ store.getActiveAccount?.Address }}
-        </p>
-      </div>
+      <OpenedAccount />
     </main>
   </div>
 </template>
-

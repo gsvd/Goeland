@@ -11,11 +11,11 @@ func ValidateXMPPAddress(address string) error {
 
 	if address == "" {
 		errs.Add("address", errorsx.ErrCodeEmptyAddress)
-	}
-
-	parts := strings.SplitN(address, "@", 2)
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		errs.Add("address", errorsx.ErrCodeInvalidAddressFormat)
+	} else {
+		parts := strings.SplitN(address, "@", 2)
+		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+			errs.Add("address", errorsx.ErrCodeInvalidAddressFormat)
+		}
 	}
 
 	if errs.HasErrors() {
